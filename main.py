@@ -12,11 +12,11 @@ from astrbot.api.provider import ProviderRequest, LLMResponse
 from astrbot.api.star import Context, Star, register
 
 @register(
-    "persona_interest_controller",
-    "Gemini",
+    "Should I respond?",
+    "。。。",
     "A plugin to dynamically adjust persona based on conversation interest for aiocqhttp.",
-    "1.1.2", # 版本号更新
-    "https://github.com/your-repo/astrophot_plugin_persona_interest_controller"
+    "0.0.1", # 版本号更新
+    "https://github.com/idk114-514/should_I_respond/"
 )
 class PersonaInterestPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
@@ -80,7 +80,7 @@ class PersonaInterestPlugin(Star):
             return
         if event.get_platform_name() != "aiocqhttp": return
 
-        logger.debug(f"[PIC] Analyzing interest for whitelisted session: {event.unified_msg_origin}.")
+        logger.debug(f"[SIR] Analyzing interest for whitelisted session: {event.unified_msg_origin}.")
         
         analysis_provider_id = self.config.get("analysis_provider_id")
         if not analysis_provider_id: return
@@ -132,12 +132,11 @@ class PersonaInterestPlugin(Star):
             analysis_result = json.loads(json_str)
 
             if not analysis_result.get("should_reply", True):
-                logger.info(f"[PIC] Analysis decided not to reply. Reason: {analysis_result.get('reason')}. Stopping event.")
+                logger.info(f"[SIR] Analysis decided not to reply. Reason: {analysis_result.get('reason')}. Stopping event.")
                 event.stop_event()
                 await self._save_history()
                 return
 
-            # --- 关键修改: 随机回复检定 ---
             reply_chance = self.config.get("random_reply_chance", 1.0)
             if random.random() > reply_chance:
                 logger.info(f"[PIC] Analysis decided to reply, but failed the random chance roll ({reply_chance * 100}%). Stopping event.")
@@ -148,17 +147,16 @@ class PersonaInterestPlugin(Star):
             interest = analysis_result.get("interest", "normal")
             feeling = analysis_result.get("feeling", "neutral")
 
-            # --- 关键修改: 将情感状态存入事件，以便后续记录 ---
             event.set_extra("pic_emotion_data", {"interest": interest, "feeling": feeling})
 
             injection_wrapper = f"[[System Note: Your current state is - Interest: '{interest}', Feeling: '{feeling}'. You MUST respond according to this state.]]\n\nUser's message is: \"{req.prompt}\""
             injection_wrapper = f"User's message is: \"{req.prompt}\"\n\n[[System Note: Your current state is - Interest: '{interest}', Feeling: '{feeling}'. You MUST respond according to this state.]]"
 
             req.prompt = injection_wrapper
-            logger.info(f"[PIC] Injected emotion into user prompt.")
+            logger.info(f"[SIR] Injected emotion into user prompt.")
 
         except Exception as e:
-            logger.error(f"[PIC] An error occurred during interest analysis: {e}", exc_info=True)
+            logger.error(f"[SIR] An error occurred during interest analysis: {e}", exc_info=True)
 
     @filter.on_llm_response(priority=10)
     async def save_llm_reply_to_history(self, event: AstrMessageEvent, resp: LLMResponse):
@@ -174,7 +172,6 @@ class PersonaInterestPlugin(Star):
                 "role": "assistant",
                 "content": bot_reply_str
             }
-            # --- 关键修改: 检查是否需要记录情感状态 ---
             if self.config.get("record_emotion_in_history", False):
                 emotion_data = event.get_extra("pic_emotion_data")
                 if emotion_data:
@@ -182,11 +179,10 @@ class PersonaInterestPlugin(Star):
             
             self.history_cache.setdefault(session_id, []).append(bot_history_entry)
             await self._save_history()
-            logger.debug(f"[PIC] Saved bot LLM reply to history for session {session_id}")
+            logger.debug(f"[SIR] Saved bot LLM reply to history for session {session_id}")
 
     @filter.command_group("sir")
     async def history_ctrl(self, event: AstrMessageEvent):
-        """管理本插件的聊天记录缓存"""
         pass
 
     @history_ctrl.command("view")
@@ -197,7 +193,6 @@ class PersonaInterestPlugin(Star):
             yield event.plain_result("当前会话没有聊天记录。")
             return
         
-        # --- 关键修改: 在视图中显示情感状态 ---
         def format_view_entry(msg: dict) -> str:
             if msg['role'] == 'user':
                 return f"[{msg.get('role')}] ({msg.get('sender_name', 'unknown')}/{msg.get('sender_id', '0')}): {msg.get('content')}"
@@ -224,4 +219,4 @@ class PersonaInterestPlugin(Star):
 
     async def terminate(self):
         await self._save_history()
-        logger.info("Persona Interest Controller plugin unloaded.")
+        logger.info("Should I respond? plugin unloaded.")
