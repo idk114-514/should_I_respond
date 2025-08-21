@@ -1,0 +1,38 @@
+{
+  "whitelist": {
+    "description": "白名单 (同时适用于群聊和私聊)",
+    "type": "list",
+    "hint": "插件仅在白名单内的会话生效。请填写群号或用户QQ号（字符串格式）。",
+    "default": []
+  },
+  "analysis_provider_id": {
+    "description": "用于分析的LLM供应商ID",
+    "type": "string",
+    "hint": "用于判断兴趣、感觉和是否回复的专用模型供应商ID。请在供应商设置中查看ID。",
+    "default": ""
+  },
+  "history_max_length": {
+    "description": "最大历史记录条数",
+    "type": "int",
+    "hint": "为每个会话（群聊/私聊）保存的最大聊天记录条数。超过此数量，最早的记录将被删除。",
+    "default": 20
+  },
+  "record_emotion_in_history": {
+    "description": "在历史记录中保存情感状态",
+    "type": "bool",
+    "hint": "启用后，将在聊天记录中一并保存机器人每次回复时的情感状态（兴趣和感觉），方便调试。",
+    "default": false
+  },
+  "random_reply_chance": {
+    "description": "随机回复概率 (0.0 - 1.0)",
+    "type": "float",
+    "hint": "即使分析模型决定回复，仍会进行一次随机检定。只有当随机数小于等于此概率时，才真正回复。1.0代表总是回复，0.0代表总不回复。",
+    "default": 1.0
+  },
+  "analysis_system_prompt": {
+    "description": "分析模型的系统提示词",
+    "type": "text",
+    "hint": "指导分析模型进行判断的系统提示词。可使用 {persona}, {history}, {awakening_context} 和 {current_message} 占位符。",
+    "default": "你是一位 AI 助手，负责分析聊天对话以确定角色的反应。\n根据角色描述和聊天记录，你必须判断角色的兴趣、感受以及他们是否应该回复。\n当群聊中出现以下情况时，请不要回复\n1. 群友在讨论专业话题，而你无法提供有价值的见解\n2. 群内正在进行命令操作，不需要你的干扰\n3. 当话题与你无关，或者你的回复可能会打断当前的对话流\n4.上下文与你无关，没有提及你的消息，或者at的是别人而非你\n5.群友在和别人对话并且没有主动提及你的时候\n6.群聊讨论的消息和你相关性较弱的时候\n\n你扮演的角色描述的：\n---\n{persona}\n---\n\n聊天记录（最近）：\n---\n{history}\n---\n\n当前消息（你将进行分析）：\n---\n{current_message}\n---\n你的任务是仅使用符合以下结构的有效 JSON 对象进行回复：\n{\n  \"interest\": \"...\",\n  \"feeling\": \"...\",\n  \"should_reply\": boolean,\n  \"reason\": \"...\"\n}"
+  }
+}
