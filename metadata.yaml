@@ -1,5 +1,5 @@
 name: should_I_respond # 这是你的插件的唯一识别名。
-desc: 我要回复这条信息吗？ # 插件简短描述
+desc: [在aiocqhttp平台测试，需要搭配主动回复功能使用]我要回复这条消息吗？当你打开主动回复的时候，LLM可能傻傻的就部分上下文一直回复。这个插件没准能解决这个问题。 # 插件简短描述
 version: v0.0.1 # 插件版本号。格式：v1.1.1 或者 v1.1
 author: 。。。 # 作者
-repo: https://github.com/idk114-514/should_I_respond/ # 插件的仓库地址
+repo: https://github.com/idk114-514/should_I_respond # 插件的仓库地址
