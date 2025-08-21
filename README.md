@@ -5,9 +5,8 @@
 ## 安装
 
 1.  **下载插件**: 克隆或下载本仓库。
-2.  **放置文件**: 将整个插件文件夹（例如 `persona_interest_controller`）放置到您 AstrBot 的 `data/plugins/` 目录下。
-3.  **重载插件**: 启动或在 AstrBot WebUI 中重载所有插件。插件所需的 `aiofiles` 库将会被自动安装。
-
+2.  **放置文件**: 将整个插件文件夹（例如 `should_i_respond`）放置到您 AstrBot 的 `data/plugins/` 目录下。
+3.  **重载插件**: 启动或在 AstrBot WebUI 中重载所有插件。
 ## 配置
 
 在 AstrBot WebUI 的插件管理页面，找到本插件并点击“管理”，您将看到以下配置项：
@@ -51,3 +50,4 @@
 
 
 [MIT](LICENSE)
+
